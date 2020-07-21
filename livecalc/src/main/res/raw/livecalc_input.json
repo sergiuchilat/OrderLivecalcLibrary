@@ -1,0 +1,104 @@
+{
+  "products": {
+    "1": {
+      "id": 1,
+      "only_juridical_sale": true,
+      "available": 99,
+      "price": 17.19
+    },
+    "2": {
+      "id": 2,
+      "only_juridical_sale": true,
+      "available": 99,
+      "price": 3.14
+    }
+  },
+  "discounts": {
+    "10": {
+      "id": 10,
+      "name": "10+1",
+      "apply_conditions": {
+        "cash_in": {
+          "amount": 50,
+          "formula": "VALUE",
+          "payment_type": "CASH"
+        },
+        "current_sale": {
+          "order": {
+            "amount": 500
+          },
+          "products_and": [
+            {
+              "id": 1,
+              "quantity": 5,
+              "amount": 100,
+              "both_conditions": true
+            },
+            {
+              "id": 2,
+              "quantity": 5,
+              "amount": 100,
+              "both_conditions": true
+            }
+          ],
+          "products_or": [
+            {
+              "id": 1,
+              "quantity": 5,
+              "amount": 100,
+              "both_conditions": true
+            },
+            {
+              "id": 2,
+              "quantity": 5,
+              "amount": 100,
+              "both_conditions": true
+            }
+          ]
+        }
+      },
+      "apply_to": "EACH_PRODUCT",
+      "formula": "VALUE",
+      "value": 1,
+      "result_type": "PRODUCTS_SAME",
+      "combine_with": [],
+      "products": [1, 2],
+      "bonus_products": [],
+      "price_to_apply": "DISCOUNTED_PRICE",
+      "zero_order": false
+    }
+  },
+  "sales_history": {
+    "store": {
+      "month": {
+        "1": 150
+      },
+      "year": {
+        "1": 18000
+      },
+      "all": {
+        "1": 200000
+      }
+    },
+    "client": {
+      "month": {
+        "1": 300
+      },
+      "year": {
+        "1": 36000
+      },
+      "all": {
+        "1": 400000
+      }
+    }
+  },
+  "store2discount": {
+    "1": [10, 20],
+    "2": [10],
+    "3": [20]
+  },
+  "order_settings": {
+    "split_ratio_juridical": 35,
+    "required_cash_in": 99
+  }
+}
