@@ -1,3 +1,4 @@
+/*
 package com.merax.livecalc
 
 import android.util.Log
@@ -12,11 +13,13 @@ import org.junit.runner.RunWith
 
 import org.junit.Assert.*
 
+*/
 /**
  * Instrumented test, which will execute on an Android device.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
- */
+ *//*
+
 @RunWith(AndroidJUnit4::class)
 class OrderSplitInstrumentedTest {
     @Test
@@ -42,3 +45,4 @@ class OrderSplitInstrumentedTest {
         Assert.assertEquals("com.merax.distributionapp", appContext.packageName)
     }
 }
+*/
