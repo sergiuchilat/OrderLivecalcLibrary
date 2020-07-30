@@ -2,9 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.3.72"
+    "maven-publish"
 }
 
-group = "com.merax"
+group = "com.merax.livecalc"
 version = "1.0.2"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
