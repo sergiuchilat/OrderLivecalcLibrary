@@ -1,6 +1,5 @@
 package order.livecalc.v1.Storage
 
-import android.util.Log
 
 class Storage {
     var data: StorageData = StorageData(

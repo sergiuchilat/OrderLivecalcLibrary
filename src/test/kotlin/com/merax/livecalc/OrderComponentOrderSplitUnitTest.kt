@@ -2,7 +2,7 @@ package com.merax.livecalc
 
 import order.livecalc.v1.Components.Order
 import order.livecalc.v1.Storage.*
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 import org.junit.Assert.*
 

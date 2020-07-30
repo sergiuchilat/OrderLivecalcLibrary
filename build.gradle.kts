@@ -4,8 +4,8 @@ plugins {
     kotlin("jvm") version "1.3.72"
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
+group = "com.merax"
+version = "1.0.2"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -15,6 +15,11 @@ repositories {
 }
 
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation(kotlin("stdlib"))
+    testImplementation("junit:junit:4.12")
 }
 
 tasks.withType<Test> {

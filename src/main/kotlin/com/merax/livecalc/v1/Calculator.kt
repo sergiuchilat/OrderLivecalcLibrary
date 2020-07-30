@@ -1,5 +1,4 @@
 package order.livecalc.v1
-import android.util.Log
 import order.livecalc.v1.Components.IResultGenerator
 import order.livecalc.v1.Storage.Storage
 import order.livecalc.v1.Storage.*
@@ -36,7 +35,6 @@ class Calculator : IResultGenerator {
             splitOrder()
             components.order.calculateRequiredCashIn()
         } catch (E: Exception) {
-            Log.d("livecalc", E.message.toString())
         }
     }
 
