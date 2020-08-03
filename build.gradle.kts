@@ -1,7 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    `maven-publish`
     kotlin("jvm") version "1.3.72"
+    id("org.jetbrains.dokka") version "0.10.0"
+
 }
 
 group = "com.merax.livecalc"
@@ -30,5 +33,18 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "11"
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("default") {
+            from(components["java"])
+        }
+    }
+    repositories {
+        maven {
+            url = uri("$buildDir/repository")
+        }
     }
 }
