@@ -22,6 +22,8 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.1")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation(kotlin("stdlib"))
+    implementation("com.github.jitpack:example:1.1")
+    implementation("com.github.erluxman:jitpackandroidutil:1.0.0")
     testImplementation("junit:junit:4.12")
 }
 
