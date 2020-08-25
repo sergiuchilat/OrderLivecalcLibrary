@@ -12,11 +12,11 @@ import order.livecalc.v1.Storage.*
  * @property appliedDiscounts - list of applied discounts
  * */
 class Discount(val storage: Storage) : IComponent {
-    private var discountProductsMap: HashMap<Int, HashMap<Int, ProductSelected>> = hashMapOf()
-    private var productTotals: HashMap<Int, ProductSelected> = hashMapOf()
-    private var discountTotals: HashMap<Int, ProductSelected> = hashMapOf()
-    private var orderTotals: ProductSelected =
-        ProductSelected(0, 0.0F)
+    private var discountProductsMap: HashMap<Int, HashMap<Int, Product>> = hashMapOf()
+    private var productTotals: HashMap<Int, Product> = hashMapOf()
+    private var discountTotals: HashMap<Int, Product> = hashMapOf()
+    private var orderTotals: Product =
+        Product(0, false, 0, 0.0F)
     private var bonusPoints: Int = 0
     private var appliedDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
     private var zeroOrderProducts: HashMap<Int, Int> = hashMapOf()
@@ -58,7 +58,8 @@ class Discount(val storage: Storage) : IComponent {
                 continue
             this.apply(discount, products)
         }
-        //Log.d("livecalc", appliedDiscounts.toString())
+        System.out.println("Applied discounts:" + appliedDiscounts.toString())
+        storage.data.output.discounts = appliedDiscounts
     }
 
     /**
@@ -161,7 +162,7 @@ class Discount(val storage: Storage) : IComponent {
         products: HashMap<Int, Product>
     ): HashMap<Int, Int> {
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
-        /*for ((productID, product) in products) {
+        for ((productID, product) in products) {
             val bonusQuantity = (product.quantity * discount.value).toInt()
             bonusProducts[productID] = bonusQuantity
             if (discount.zeroOrder) {
@@ -170,7 +171,7 @@ class Discount(val storage: Storage) : IComponent {
                 product.quantity += bonusQuantity
                 product.priceDiscounted = product.amountDiscounted / product.quantity
             }
-        }*/
+        }
         return bonusProducts
     }
 
@@ -234,9 +235,9 @@ class Discount(val storage: Storage) : IComponent {
      * @param inputData [InputData] - all input data
      * @return map [HashMap] - discount to product correspondence map
      */
-    fun createMap(inputData: InputData): HashMap<Int, HashMap<Int, ProductSelected>> {
+    fun createMap(inputData: InputData): HashMap<Int, HashMap<Int, Product>> {
         /*for ((productID, product) in inputData.products) {
-            productTotals[productID] = ProductSelected(
+            productTotals[productID] = Product(
                 product.quantity,
                 product.amount
             )
@@ -251,7 +252,7 @@ class Discount(val storage: Storage) : IComponent {
                 discount.products!!.isNotEmpty()) {
                 discountProductsMap[discountID] = hashMapOf()
                 discountTotals[discountID] =
-                    ProductSelected(
+                    Product(
                         0,
                         0.0F
                     )
@@ -261,7 +262,7 @@ class Discount(val storage: Storage) : IComponent {
                 if (discount.products!!.isNotEmpty() && discount.products!!.indexOf(productID) != -1) {
                     discountProductsMap[discountID]?.put(
                         productID,
-                        ProductSelected(
+                        Product(
                             product.quantity,
                             product.amount
                         )
@@ -279,7 +280,7 @@ class Discount(val storage: Storage) : IComponent {
     }
 
 
-    fun getMap(): HashMap<Int, HashMap<Int, ProductSelected>> {
+    fun getMap(): HashMap<Int, HashMap<Int, Product>> {
         return discountProductsMap
     }
 }

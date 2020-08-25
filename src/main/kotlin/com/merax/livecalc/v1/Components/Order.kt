@@ -11,8 +11,8 @@ class Order(val storage: Storage) : IComponent {
 
     fun calculateProductAmount(
         products: HashMap<Int, Product> = hashMapOf(),
-        productsSelected: HashMap<Int, ProductSelected>
-    ): HashMap<Int, ProductSelected> {
+        productsSelected: HashMap<Int, Product>
+    ): HashMap<Int, Product> {
 
         if (products.isNullOrEmpty()) {
             return hashMapOf()
@@ -20,11 +20,12 @@ class Order(val storage: Storage) : IComponent {
         if (productsSelected.isEmpty()) {
             return hashMapOf()
         }
-        val productsResult = hashMapOf<Int, ProductSelected>()
+        val productsResult = hashMapOf<Int, Product>()
         var orderAmount = 0.0F
 
         for ((productID, product) in productsSelected) {
             if (product.quantity > 0) {
+                product.id = productID
                 product.price = Utils().roundUp(products[productID]!!.price, 2)
                 product.priceDiscounted = product.price
                 product.amount = Utils().roundUp(products[productID]!!.price * product.quantity, 2)
@@ -86,7 +87,8 @@ class Order(val storage: Storage) : IComponent {
 
             if (storage.data.output.zeroOrderProducts.containsKey(productID)) {
                 orders.zeroPrice!!.products[productID] =
-                    ProductSelected(
+                    Product(
+                        id = productID,
                         quantity = storage.data.output.zeroOrderProducts[productID]!!,
                         price = 0.0F,
                         amount = 0.0F,
@@ -95,7 +97,8 @@ class Order(val storage: Storage) : IComponent {
                     )
             }
 
-            orders.basic!!.products[productID] = ProductSelected(
+            orders.basic!!.products[productID] = Product(
+                id = productID,
                 quantity = basicQuantity,
                 price = product.price,
                 amount = product.price * basicQuantity,
@@ -103,7 +106,8 @@ class Order(val storage: Storage) : IComponent {
                 amountDiscounted = product.price * basicQuantity
             )
 
-            orders.additional!!.products[productID] = ProductSelected(
+            orders.additional!!.products[productID] = Product(
+                id = productID,
                 quantity = additionalQuantity,
                 price = product.price,
                 amount = product.price * additionalQuantity,

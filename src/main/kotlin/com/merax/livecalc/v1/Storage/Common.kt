@@ -30,21 +30,18 @@ enum class ShipmentMethod {
 data class Product(
     @SerializedName("id")
     @Expose
-    var id: Int,
+    var id: Int = 0,
     @SerializedName("only_juridical_sale")
     @Expose
     var onlyJuridicalSale: Boolean = false,
     @SerializedName("available")
     @Expose
-    var available: Int,
+    var available: Int = 0,
     @SerializedName("price")
     @Expose
-    var price: Float
-)
-
-data class ProductSelected(
-    var quantity: Int,
     var price: Float = 0.0F,
+
+    var quantity: Int = 0,
     var amount: Float = 0.0F,
     var priceDiscounted: Float = 0.0F,
     var amountDiscounted: Float = 0.0F

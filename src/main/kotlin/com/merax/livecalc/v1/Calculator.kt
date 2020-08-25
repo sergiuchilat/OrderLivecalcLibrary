@@ -52,8 +52,8 @@ class Calculator : IResultGenerator {
     }
 
 
-    fun setProductsQuantity(productSelected: HashMap<Int, ProductSelected>){
-        storage.setProductsQuantity(productSelected)
+    fun setProductsQuantity(Product: HashMap<Int, Product>){
+        storage.setProductsQuantity(Product)
     }
 
     /**

@@ -51,7 +51,7 @@ class Storage {
         data.input.cashIn = cash
     }
 
-    fun setProductsQuantity(products: HashMap <Int, ProductSelected>){
+    fun setProductsQuantity(products: HashMap <Int, Product>){
         data.output.products = products
     }
 

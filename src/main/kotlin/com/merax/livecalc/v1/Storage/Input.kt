@@ -55,7 +55,7 @@ data class DiscountInput(
 
     @SerializedName("bonus_products")
     @Expose
-    var bonusProducts: HashMap<Int, ProductSelected> ? = hashMapOf(),
+    var bonusProducts: HashMap<Int, Product> ? = hashMapOf(),
 
     @SerializedName("price_to_apply")
     @Expose

@@ -79,7 +79,8 @@ class OrderComponentOrderSplitUnitTest {
         )
 
         storage.data.output.products = hashMapOf(
-            1 to ProductSelected(
+            1 to Product(
+                id = 1,
                 quantity = 5
             )
         )
@@ -122,7 +123,7 @@ class OrderComponentOrderSplitUnitTest {
         )
 
         storage.data.output.products = hashMapOf(
-            1 to ProductSelected(
+            1 to Product(
                 quantity = 5
             )
         )

@@ -29,7 +29,7 @@ class Seed {
                 DiscountResultType.PRODUCTS_SAME,
                 listOf(),
                 listOf(1, 2, 3),
-                hashMapOf(5 to ProductSelected(1, 0.0F, 3)),
+                hashMapOf(5 to Product(1, 0.0F, 3)),
                 DiscountPriceToApplyType.DISCOUNTED_PRICE,
                 false
             )
@@ -74,7 +74,7 @@ class Seed {
                 DiscountResultType.PRODUCTS_SAME,
                 listOf(20),
                 listOf(1, 2, 3),
-                hashMapOf(4 to ProductSelected(1, 0.0F, 3)),
+                hashMapOf(4 to Product(1, 0.0F, 3)),
                 DiscountPriceToApplyType.BASIC_PRICE,
                 false
             )

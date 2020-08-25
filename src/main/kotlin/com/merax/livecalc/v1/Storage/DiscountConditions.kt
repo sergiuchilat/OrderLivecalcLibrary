@@ -92,12 +92,12 @@ data class DateTime(
 data class DiscountConditions (
     @SerializedName("current_sale")
     @Expose
-    var currentSale: CurrentSale,
-    var orderSettings: OrderSettings,
-    var cashIn: CashIn,
-    var quotas: Quotas,
-    var salesHistory: SalesHistory,
-    var clientSettings: ClientSettings,
-    var dateTime: DateTime,
-    var materials: Int
+    var currentSale: CurrentSale? = null,
+    var orderSettings: OrderSettings? = null,
+    var cashIn: CashIn? = null,
+    var quotas: Quotas? = null,
+    var salesHistory: SalesHistory? = null,
+    var clientSettings: ClientSettings? = null,
+    var dateTime: DateTime? = null,
+    var materials: Int? = null
 )
