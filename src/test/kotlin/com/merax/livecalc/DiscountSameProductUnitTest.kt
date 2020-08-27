@@ -18,6 +18,7 @@ class DiscountSameProductUnitTest {
 
     private var discounts: HashMap<String, DiscountIN> = hashMapOf(
         "10+1_same" to DiscountIN(
+            id = 1,
             condition = DiscountCondition(
                 type = DiscountConditionTypes.QUANTITY,
                 apply = DiscountConditionApply.FOREACH,
@@ -40,6 +41,7 @@ class DiscountSameProductUnitTest {
             )
         ),
         "10+1_other" to DiscountIN(
+            id = 2,
             condition = DiscountCondition(
                 type = DiscountConditionTypes.QUANTITY,
                 apply = DiscountConditionApply.FOREACH,
@@ -62,6 +64,7 @@ class DiscountSameProductUnitTest {
             )
         ),
         "10+select_1_from_2" to DiscountIN(
+            id = 3,
             condition = DiscountCondition(
                 type = DiscountConditionTypes.QUANTITY,
                 apply = DiscountConditionApply.FOREACH,
@@ -149,15 +152,18 @@ class DiscountSameProductUnitTest {
         val productsSelectedInput = hashMapOf(
             1 to Product(
                 id = 1,
+                quantity = 10
+            ),
+            2 to Product(
+                id = 2,
                 quantity = 2
             )
         )
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
         orderComponent.calculateProductAmount(storage.data.input.products, productsSelectedInput)
-        discountComponent.createMap(storage.getInputData())
-        discountComponent.apply(storage.getInputData().discounts, storage.getInputData().products)
-        System.out.println(storage.data.output.discounts)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
         assertEquals(emptyDiscounts, storage.data.output.discounts)
     }
 
@@ -169,17 +175,22 @@ class DiscountSameProductUnitTest {
                 onlyJuridicalSale = false,
                 available = 10,
                 price = 1.25F,
-                quantity = 6
+                quantity = 9
+            ),
+            2 to Product(
+                id = 2,
+                onlyJuridicalSale = false,
+                available = 20,
+                price = 3.14F,
+                quantity = 2
             )
         )
 
-        val selected: Float = 10.0F;
-        val bonusDelta = 3;
-        val bonus = 2;
+        storage.data.input.discounts.put(1, discounts["10+1_same"]!!)
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
         orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
-        discountComponent.createMap(storage.getInputData())
+        discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.getInputData().discounts, storage.data.input.products)
         System.out.println(storage.data.output.discounts)
         //assertEquals(emptyDiscounts, storage.data.output.discounts)

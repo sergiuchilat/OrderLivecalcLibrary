@@ -1,9 +1,11 @@
 package order.livecalc.v1.Components
 
+import com.merax.livecalc.v1.Storage.DiscountConditionApply
 import com.merax.livecalc.v1.Storage.DiscountIN
 import com.merax.livecalc.v1.Storage.DiscountResultTypes
 import order.livecalc.v1.Components.DiscountConditions.CheckCondition
 import order.livecalc.v1.Storage.*
+import kotlin.math.floor
 
 /** Discount calculation component
  * @property discountProductsMap - discount to product map
@@ -55,6 +57,7 @@ class Discount(val storage: Storage) : IComponent {
      * @param products [HashMap] - list of products in order
      */
     fun apply(discounts: HashMap<Int, DiscountIN>, products: HashMap<Int, Product>) {
+        println(discounts.toString())
         for ((_, discount) in discounts) {
             if (!this.canApply(discount))
                 continue
@@ -102,6 +105,10 @@ class Discount(val storage: Storage) : IComponent {
         var discountBonusPoints = 0
         var discountProducts: HashMap<Int, Int> = hashMapOf()
         val discountProductsToSelect: HashMap<Int, Int> = hashMapOf()
+
+        when (discount.result?.type ) {
+            DiscountResultTypes.PRODUCTS -> discountProducts = generateBonusProducts(discount, products)
+        }
 
         this.appliedDiscounts[discount.id] =
             DiscountOutput(
@@ -153,9 +160,13 @@ class Discount(val storage: Storage) : IComponent {
         discount: DiscountIN,
         products: HashMap<Int, Product>
     ): HashMap<Int, Int> {
-        println(products.toString())
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
-
+        for (item in discount.result?.content!!){
+            var coeficient = 1;
+            if(discount.condition?.apply == DiscountConditionApply.FOREACH)
+                coeficient = floor(productTotals[item.id]?.quantity!! / 10.0F).toInt();
+            bonusProducts.put(item.id, item.value.toInt() * coeficient)
+        }
         return bonusProducts
     }
 
@@ -198,18 +209,21 @@ class Discount(val storage: Storage) : IComponent {
      * @return map [HashMap] - discount to product correspondence map
      */
     fun createMap(inputData: InputData): HashMap<Int, HashMap<Int, Product>> {
-        /*for ((productID, product) in inputData.products) {
+        for ((productID, product) in inputData.products) {
             productTotals[productID] = Product(
-                product.quantity,
-                product.amount
+                id = productID,
+                quantity = product.quantity,
+                amount = product.amount
             )
 
             orderTotals.quantity += product.quantity
             orderTotals.amount += product.amount
         }
+       /* println("---")
+        println("product totals: " + productTotals.toString())
+        println("---")*/
 
-
-        for ((discountID, discount) in inputData.discounts) {
+        /*for ((discountID, discount) in inputData.discounts) {
             if (
                 discount.products!!.isNotEmpty()) {
                 discountProductsMap[discountID] = hashMapOf()
@@ -234,10 +248,7 @@ class Discount(val storage: Storage) : IComponent {
                     discountTotals[discountID]!!.amount += product.amount
                 }
             }
-        }
-        *//*Log.d("livecalc", discountProductsMap.toString())
-        Log.d("livecalc", discountProductTotals.toString())
-        Log.d("livecalc", "after")*/
+        }*/
         return discountProductsMap
     }
 

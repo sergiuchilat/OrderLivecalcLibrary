@@ -51,7 +51,7 @@ data class DiscountResultContent(
 data class DiscountResult(
     var type: DiscountResultTypes = DiscountResultTypes.PRODUCTS,
     var match: DiscountResultMatch = DiscountResultMatch.AND,
-    var content: List<DiscountResultContent> = listOf()
+    var content: List<DiscountResultContent>? = listOf()
 )
 
 data class DiscountIN(
