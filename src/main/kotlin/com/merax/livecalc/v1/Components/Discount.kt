@@ -1,5 +1,7 @@
 package order.livecalc.v1.Components
 
+import com.merax.livecalc.v1.Storage.DiscountIN
+import com.merax.livecalc.v1.Storage.DiscountResultTypes
 import order.livecalc.v1.Components.DiscountConditions.CheckCondition
 import order.livecalc.v1.Storage.*
 
@@ -26,7 +28,7 @@ class Discount(val storage: Storage) : IComponent {
     fun getAppliedDiscounts() = appliedDiscounts
     fun getZeroOrderProducts() = zeroOrderProducts
 
-    fun init(discounts: HashMap<Int, DiscountInput>) {
+    fun init(discounts: HashMap<Int, DiscountIN>) {
         for ((_, discount) in discounts) {
             discount.canBeApplied = true
         }
@@ -42,7 +44,7 @@ class Discount(val storage: Storage) : IComponent {
         val history = storage.data.input.salesHistory
         return history.client.month[1]!! > discount.applyConditions.salesHistory.salesAmountFrom
     }*/
-    private fun filterByClientSettings(discount: DiscountInput):Boolean{
+    private fun filterByClientSettings(discount: DiscountIN):Boolean{
         return true
     }
 
@@ -52,7 +54,7 @@ class Discount(val storage: Storage) : IComponent {
      * @param discounts [HashMap] - list of discounts to be applied
      * @param products [HashMap] - list of products in order
      */
-    fun apply(discounts: HashMap<Int, DiscountInput>, products: HashMap<Int, Product>) {
+    fun apply(discounts: HashMap<Int, DiscountIN>, products: HashMap<Int, Product>) {
         for ((_, discount) in discounts) {
             if (!this.canApply(discount))
                 continue
@@ -68,7 +70,7 @@ class Discount(val storage: Storage) : IComponent {
      * @return canBeApplied [Boolean]
      */
 
-    private fun canApply(discount: DiscountInput) =
+    private fun canApply(discount: DiscountIN) =
         canBeCombined(discount) && checkApplyCondition(discount)
 
     /**
@@ -76,7 +78,7 @@ class Discount(val storage: Storage) : IComponent {
      * @param discount[DiscountInput] - discount item
      * @return checkApplyCondition [Boolean]
      * */
-    private fun checkApplyCondition(discount: DiscountInput): Boolean =
+    private fun checkApplyCondition(discount: DiscountIN): Boolean =
         checkCondition.checkAll(discount)
 
     /**
@@ -84,10 +86,10 @@ class Discount(val storage: Storage) : IComponent {
      * @param discount[DiscountInput] - discount item
      * @return canBeCombined [Boolean]
      * */
-    private fun canBeCombined(discount: DiscountInput) =
-        discount.combineWith!!.isEmpty() || appliedDiscounts.isEmpty() || (discount.combineWith?.intersect(
+    private fun canBeCombined(discount: DiscountIN) = true
+        /*discount.combineWith!!.isEmpty() || appliedDiscounts.isEmpty() || (discount.combineWith?.intersect(
             appliedDiscounts.keys
-        ))!!.isNotEmpty()
+        ))!!.isNotEmpty()*/
 
     /**
      * Apply one of discounts
@@ -95,20 +97,11 @@ class Discount(val storage: Storage) : IComponent {
      * @param products [HashMap] - list of products in order
      *
      */
-    private fun apply(discount: DiscountInput, products: HashMap<Int, Product>) {
+    private fun apply(discount: DiscountIN, products: HashMap<Int, Product>) {
         var discountSum = 0.0F
         var discountBonusPoints = 0
         var discountProducts: HashMap<Int, Int> = hashMapOf()
         val discountProductsToSelect: HashMap<Int, Int> = hashMapOf()
-        when (discount.resultType) {
-            DiscountResultType.AMOUNT -> discountSum = this.calculateBonusSum(discount, products)
-            DiscountResultType.PRODUCTS_SAME -> discountProducts =
-                this.generateBonusProducts(discount, products)
-            /*DiscountResultType.PRODUCTS_OTHER -> discountProductsToSelect =
-                this.generateBonusProductsToSelect(discount)*/
-            DiscountResultType.POINTS -> discountBonusPoints =
-                this.generateBonusPoints(discount, products)
-        }
 
         this.appliedDiscounts[discount.id] =
             DiscountOutput(
@@ -118,7 +111,6 @@ class Discount(val storage: Storage) : IComponent {
                 discountProductsToSelect,
                 discountBonusPoints
             )
-        //Log.d("livecalc", zeroOrderProducts.toString())
     }
 
     /**
@@ -128,7 +120,7 @@ class Discount(val storage: Storage) : IComponent {
      * @return discountSum [Float] - discount sum
      */
     private fun calculateBonusSum(
-        discount: DiscountInput,
+        discount: DiscountIN,
         products: HashMap<Int, Product>
     ): Float {
         var discountSum = 0.0F
@@ -158,35 +150,12 @@ class Discount(val storage: Storage) : IComponent {
      * @return bonusProducts [HashMap] - list of bonus products
      */
     private fun generateBonusProducts(
-        discount: DiscountInput,
+        discount: DiscountIN,
         products: HashMap<Int, Product>
     ): HashMap<Int, Int> {
         println(products.toString())
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
-        for ((productID, product) in products) {
-            val bonusQuantity = (product.quantity * discount.value).toInt()
-            bonusProducts[productID] = bonusQuantity
-            if (discount.zeroOrder) {
-                zeroOrderProducts[productID] = bonusQuantity
-            } else {
-                product.quantity += bonusQuantity
-                product.priceDiscounted = product.amountDiscounted / product.quantity
-            }
-        }
-        return bonusProducts
-    }
 
-    /**
-     * Generate bonus products to select
-     * @param discount [DiscountInput] - list of discounts to be applied
-     * @return bonusProducts [HashMap] - list of bonus products to be selected
-     */
-    //Todo implement OtherProducts algorithm
-    private fun generateBonusProductsToSelect(discount: DiscountInput): HashMap<Int, Int> {
-        val bonusProducts: HashMap<Int, Int> = hashMapOf()
-        discount.bonusProducts!!.forEach {
-            bonusProducts[it.key] = (13 * discount.value).toInt()
-        }
         return bonusProducts
     }
 
@@ -197,7 +166,7 @@ class Discount(val storage: Storage) : IComponent {
      * @return bonusProducts [Int] - list of bonus products to be selected
      */
     private fun generateBonusPoints(
-        discount: DiscountInput,
+        discount: DiscountIN,
         products: HashMap<Int, Product>
     ): Int {
         var discountBonusPoints = 0
@@ -216,19 +185,11 @@ class Discount(val storage: Storage) : IComponent {
      * @return value [Float] - value of discount
      */
     private fun calculatedValue(
-        discount: DiscountInput,
+        discount: DiscountIN,
         priceForCalculation: Float,
         products: HashMap<Int, Product>
     ): Float {
-        return if (discount.formula == DiscountFormula.PERCENT) {
-            priceForCalculation * discount.value / 100
-        } else {
-            priceForCalculation - when (discount.applyTo) {
-                DiscountApplyToType.ORDER -> Utils().roundDown(discount.value / products.size, 2)
-                DiscountApplyToType.EACH_PRODUCT -> discount.value
-                DiscountApplyToType.EACH_PRODUCT_IN_CONDITION -> discount.value//Todo apply only for products in condition
-            }
-        }
+        return 0.0F
     }
 
     /**

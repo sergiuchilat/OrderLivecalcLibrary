@@ -2,8 +2,8 @@ package order.livecalc.v1.Storage
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.merax.livecalc.v1.Storage.DiscountIN
 import order.livecalc.v1.Storage.DiscountConditions.DiscountConditions
-import java.time.temporal.TemporalAmount
 
 
 data class CashInItem(
@@ -107,7 +107,7 @@ data class InputData (
 
     @SerializedName("discounts")
     @Expose
-    var discounts: HashMap<Int, DiscountInput>,
+    var discounts: HashMap<Int, DiscountIN>,
 
     @SerializedName("order_settings")
     @Expose

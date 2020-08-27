@@ -1,11 +1,12 @@
 package order.livecalc.v1.Components.DiscountConditions
 
+import com.merax.livecalc.v1.Storage.DiscountIN
 import order.livecalc.v1.Storage.DiscountInput
 
 class CheckCondition {
-    private var discount: DiscountInput? = null
+    private var discount: DiscountIN? = null
 
-    fun checkAll(discountInput: DiscountInput): Boolean {
+    fun checkAll(discountInput: DiscountIN): Boolean {
         discount = discountInput
         return checkCurrentSale()
                 && checkOrderSettings()

@@ -24,13 +24,13 @@ data class DiscountConditionContent(
 data class DiscountCondition(
     var type: DiscountConditionTypes = DiscountConditionTypes.QUANTITY,
     var apply: DiscountConditionApply = DiscountConditionApply.ONCE,
-    var conent: List<DiscountConditionContent>
+    var content: List<DiscountConditionContent>
 )
 /*
 * If discount match condition, will generate new products, percent of amount (-price) or percent to reuse for other products
 * */
 enum class DiscountResultTypes{
-    PRODUCTS, PERCENT, PERCENT_REUSE
+    PRODUCTS, PERCENT, PERCENT_REUSE, PRODUCTS_ZERO, POINTS
 }
 /*
 * AND - all selected will be returned, OR - can select one of returned
@@ -54,7 +54,9 @@ data class DiscountResult(
     var content: List<DiscountResultContent> = listOf()
 )
 
-data class Discount(
+data class DiscountIN(
+    var id: Int = 0,
+    var canBeApplied: Boolean = true,
     var condition: DiscountCondition? = null,
     var result: DiscountResult? = null
 )

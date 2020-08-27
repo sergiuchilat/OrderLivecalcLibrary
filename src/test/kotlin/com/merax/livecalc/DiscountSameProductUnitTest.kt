@@ -1,6 +1,6 @@
 package com.merax.livecalc
 
-import order.livecalc.v1.Calculator
+import com.merax.livecalc.v1.Storage.*
 import order.livecalc.v1.Components.Discount
 import order.livecalc.v1.Components.Order
 import order.livecalc.v1.Storage.*
@@ -8,7 +8,6 @@ import order.livecalc.v1.Storage.CashIn
 import order.livecalc.v1.Storage.DiscountConditions.*
 import order.livecalc.v1.Storage.OrderSettings
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.jupiter.api.Test
 
 
@@ -17,8 +16,82 @@ class DiscountSameProductUnitTest {
     private var orderComponent = Order(storage)
     private var discountComponent = Discount(storage)
 
+    private var discounts: HashMap<String, DiscountIN> = hashMapOf(
+        "10+1_same" to DiscountIN(
+            condition = DiscountCondition(
+                type = DiscountConditionTypes.QUANTITY,
+                apply = DiscountConditionApply.FOREACH,
+                content = listOf(
+                    DiscountConditionContent(
+                        id = listOf(1),
+                        value = 10.0F
+                    )
+                )
+            ),
+            result = DiscountResult(
+                type = DiscountResultTypes.PRODUCTS,
+                match = DiscountResultMatch.AND,
+                content = listOf(
+                    DiscountResultContent(
+                        id = 1,
+                        value = 1.0F
+                    )
+                )
+            )
+        ),
+        "10+1_other" to DiscountIN(
+            condition = DiscountCondition(
+                type = DiscountConditionTypes.QUANTITY,
+                apply = DiscountConditionApply.FOREACH,
+                content = listOf(
+                    DiscountConditionContent(
+                        id = listOf(1),
+                        value = 10.0F
+                    )
+                )
+            ),
+            result = DiscountResult(
+                type = DiscountResultTypes.PRODUCTS,
+                match = DiscountResultMatch.AND,
+                content = listOf(
+                    DiscountResultContent(
+                        id = 2,
+                        value = 1.0F
+                    )
+                )
+            )
+        ),
+        "10+select_1_from_2" to DiscountIN(
+            condition = DiscountCondition(
+                type = DiscountConditionTypes.QUANTITY,
+                apply = DiscountConditionApply.FOREACH,
+                content = listOf(
+                    DiscountConditionContent(
+                        id = listOf(1),
+                        value = 10.0F
+                    )
+                )
+            ),
+            result = DiscountResult(
+                type = DiscountResultTypes.PRODUCTS,
+                match = DiscountResultMatch.OR,
+                content = listOf(
+                    DiscountResultContent(
+                        id = 2,
+                        value = 1.0F
+                    ),
+                    DiscountResultContent(
+                        id = 2,
+                        value = 1.0F
+                    )
+                )
+            )
+        )
+    )
+
     init {
         initDataProvider()
+        println(discounts.toString())
     }
 
     private fun initDataProvider() {
@@ -103,26 +176,6 @@ class DiscountSameProductUnitTest {
         val selected: Float = 10.0F;
         val bonusDelta = 3;
         val bonus = 2;
-
-        storage.data.input.discounts = hashMapOf(
-            1 to DiscountInput(
-                id = 1,
-                canBeApplied = true,
-                applied = false,
-                applyConditions = DiscountConditions(
-
-                ),
-                applyTo = DiscountApplyToType.EACH_PRODUCT,
-                formula = DiscountFormula.VALUE,
-                resultType = DiscountResultType.PRODUCTS_SAME,
-                value = selected / bonusDelta * bonus,
-                combineWith = listOf(),
-                products = listOf(),
-                bonusProducts = hashMapOf(),
-                priceToApply = DiscountPriceToApplyType.BASIC_PRICE,
-                zeroOrder = false
-            )
-        )
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
         orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
