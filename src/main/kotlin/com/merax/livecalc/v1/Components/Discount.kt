@@ -161,6 +161,7 @@ class Discount(val storage: Storage) : IComponent {
         discount: DiscountInput,
         products: HashMap<Int, Product>
     ): HashMap<Int, Int> {
+        println(products.toString())
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
         for ((productID, product) in products) {
             val bonusQuantity = (product.quantity * discount.value).toInt()

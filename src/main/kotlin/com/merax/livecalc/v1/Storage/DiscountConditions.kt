@@ -26,6 +26,10 @@ data class ProductCondition(
 * */
 
 
+enum class DiscountApplyTypes{
+    ORDER_SUM
+}
+
 /*
 * Discount applied on order sum for any product
 * */
