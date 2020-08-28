@@ -182,7 +182,8 @@ class DiscountSameProductUnitTest {
         orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
-        assertFalse("Incorrect quantity", storage.data.output.discounts.isEmpty())
+        println(storage.data.output.discounts.isEmpty())
+        assertFalse("Generated bonus ", !storage.data.output.discounts.isEmpty())
     }
 
     /*
