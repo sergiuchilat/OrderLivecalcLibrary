@@ -8,8 +8,14 @@ import order.livecalc.v1.Storage.CashIn
 import order.livecalc.v1.Storage.DiscountConditions.*
 import order.livecalc.v1.Storage.OrderSettings
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.jupiter.api.Test
 
+data class ProductMap(
+    val id: Int,
+    val quantity: Int,
+    val price: Float
+)
 
 class DiscountSameProductUnitTest {
     private var storage: Storage = Storage()
@@ -94,7 +100,6 @@ class DiscountSameProductUnitTest {
 
     init {
         initDataProvider()
-        println(discounts.toString())
     }
 
     private fun initDataProvider() {
@@ -139,61 +144,57 @@ class DiscountSameProductUnitTest {
         )
     }
 
+    private fun generateProductVariants(products: List<ProductMap>): HashMap<Int, Product>{
+        val resultContent = hashMapOf<Int, Product>()
+        for(product in products){
+            resultContent.put(product.id, Product(
+                id = product.id,
+                quantity = product.quantity,
+                price = product.price
+            ))
+        }
+        return resultContent
+    }
+
     @Test
     fun emptyDiscounts() {
-        storage.data.input.products = hashMapOf(
-            1 to Product(
-                id = 1,
-                onlyJuridicalSale = false,
-                available = 10,
-                price = 1.25F
-            )
-        )
-        val productsSelectedInput = hashMapOf(
-            1 to Product(
-                id = 1,
-                quantity = 10
-            ),
-            2 to Product(
-                id = 2,
-                quantity = 2
-            )
-        )
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 10, 3.23F)
+        ))
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
-        orderComponent.calculateProductAmount(storage.data.input.products, productsSelectedInput)
+        orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
         assertEquals(emptyDiscounts, storage.data.output.discounts)
     }
 
     @Test
-    fun oneDiscount() {
-        storage.data.input.products = hashMapOf(
-            1 to Product(
-                id = 1,
-                onlyJuridicalSale = false,
-                available = 10,
-                price = 1.25F,
-                quantity = 9
-            ),
-            2 to Product(
-                id = 2,
-                onlyJuridicalSale = false,
-                available = 20,
-                price = 3.14F,
-                quantity = 2
-            )
-        )
-
+    fun testN_FOR_M() {
+        /*Test 10 + 1*/
         storage.data.input.discounts.put(1, discounts["10+1_same"]!!)
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 8, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(2, 10, 3.45F)
+        ))
 
-        val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
         orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
         discountComponent.createMap(storage.data.input)
-        discountComponent.apply(storage.getInputData().discounts, storage.data.input.products)
-        System.out.println(storage.data.output.discounts)
-        //assertEquals(emptyDiscounts, storage.data.output.discounts)
+        discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
+        assertFalse("Incorrect quantity", storage.data.output.discounts.isEmpty())
     }
+
+    /*
+    * 10 + 1 foreach
+    *
+    * null -> 0
+    * 8 -> 0
+    * 10 -> 1
+    *
+    * 19 -> 1
+    * 20 -> 2
+    *
+    * */
 
 }

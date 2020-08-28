@@ -1,6 +1,7 @@
 package order.livecalc.v1.Components
 
 import com.merax.livecalc.v1.Storage.DiscountConditionApply
+import com.merax.livecalc.v1.Storage.DiscountConditionContent
 import com.merax.livecalc.v1.Storage.DiscountIN
 import com.merax.livecalc.v1.Storage.DiscountResultTypes
 import order.livecalc.v1.Components.DiscountConditions.CheckCondition
@@ -57,13 +58,11 @@ class Discount(val storage: Storage) : IComponent {
      * @param products [HashMap] - list of products in order
      */
     fun apply(discounts: HashMap<Int, DiscountIN>, products: HashMap<Int, Product>) {
-        println(discounts.toString())
         for ((_, discount) in discounts) {
             if (!this.canApply(discount))
                 continue
             this.apply(discount, products)
         }
-        System.out.println("Applied discounts:" + appliedDiscounts.toString())
         storage.data.output.discounts = appliedDiscounts
     }
 
@@ -110,14 +109,16 @@ class Discount(val storage: Storage) : IComponent {
             DiscountResultTypes.PRODUCTS -> discountProducts = generateBonusProducts(discount, products)
         }
 
-        this.appliedDiscounts[discount.id] =
-            DiscountOutput(
-                discount.id,
-                discountSum,
-                discountProducts,
-                discountProductsToSelect,
-                discountBonusPoints
-            )
+        if (discountProducts.size > 0){
+            this.appliedDiscounts[discount.id] =
+                DiscountOutput(
+                    discount.id,
+                    discountSum,
+                    discountProducts,
+                    discountProductsToSelect,
+                    discountBonusPoints
+                )
+        }
     }
 
     /**
@@ -161,11 +162,22 @@ class Discount(val storage: Storage) : IComponent {
         products: HashMap<Int, Product>
     ): HashMap<Int, Int> {
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
-        for (item in discount.result?.content!!){
-            var coeficient = 1;
-            if(discount.condition?.apply == DiscountConditionApply.FOREACH)
-                coeficient = floor(productTotals[item.id]?.quantity!! / 10.0F).toInt();
-            bonusProducts.put(item.id, item.value.toInt() * coeficient)
+        for (product in discount.result?.content!!){
+            var coeficient = 0;
+            val quantity = discount.condition?.content?.first { it.id.contains(product.id)  }?.value!!
+            if(discount.condition?.apply == DiscountConditionApply.FOREACH){
+                if (quantity != 0.0F){
+                    coeficient = floor(productTotals[product.id]?.quantity!! / quantity).toInt()
+                }
+                if(coeficient > 0){
+                    bonusProducts.put(product.id, product.value.toInt() * coeficient)
+                }
+            } else if(discount.condition?.apply == DiscountConditionApply.ONCE){
+                if(quantity > 0){
+                    bonusProducts.put(product.id, quantity.toInt())
+                }
+            }
+
         }
         return bonusProducts
     }

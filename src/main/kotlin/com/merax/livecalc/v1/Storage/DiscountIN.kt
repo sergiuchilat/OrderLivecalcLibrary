@@ -24,7 +24,7 @@ data class DiscountConditionContent(
 data class DiscountCondition(
     var type: DiscountConditionTypes = DiscountConditionTypes.QUANTITY,
     var apply: DiscountConditionApply = DiscountConditionApply.ONCE,
-    var content: List<DiscountConditionContent>
+    var content: List<DiscountConditionContent> = listOf()
 )
 /*
 * If discount match condition, will generate new products, percent of amount (-price) or percent to reuse for other products
