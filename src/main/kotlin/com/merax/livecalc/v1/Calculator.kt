@@ -61,7 +61,7 @@ class Calculator : IResultGenerator {
      */
     private fun calculateProductAmount() {
         storage.setProductsQuantity(
-            components.order.calculateProductAmount(storage.getInputData().products, storage.getOutputData().products)
+            components.order.calculateProductAmount(storage.getInputData().products)
         )
         if (storage.getInputData().products.isEmpty()) {
             throw Exception("Null amount")
@@ -74,7 +74,7 @@ class Calculator : IResultGenerator {
      */
     private fun applyDiscounts(): Calculator {
         components.discount.createMap(storage.getInputData())
-        components.discount.apply(storage.getInputData().discounts, storage.getInputData().products)
+        components.discount.apply(storage.getInputData().discounts)
         return this
     }
 

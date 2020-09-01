@@ -27,7 +27,7 @@ class OrderComponentProductAmountUnitTest {
         )
 
         val productsSelectedOutput = hashMapOf<Int, Product>()
-        val productsAmount = orderComponent.calculateProductAmount(products, productsSelectedInput)
+        val productsAmount = orderComponent.calculateProductAmount(products)
 
         assertEquals(productsSelectedOutput, productsAmount)
     }
@@ -57,7 +57,7 @@ class OrderComponentProductAmountUnitTest {
         )
 
         val productsSelectedOutput = hashMapOf<Int, Product>()
-        val productsAmount = orderComponent.calculateProductAmount(products, productsSelectedInput)
+        val productsAmount = orderComponent.calculateProductAmount(products)
 
         assertEquals(productsSelectedOutput, productsAmount)
     }
@@ -77,7 +77,7 @@ class OrderComponentProductAmountUnitTest {
         val productsSelectedInput = hashMapOf<Int, Product>()
 
         val productsSelectedOutput = hashMapOf<Int, Product>()
-        val productsAmount = orderComponent.calculateProductAmount(products, productsSelectedInput)
+        val productsAmount = orderComponent.calculateProductAmount(products)
 
         assertEquals(productsSelectedOutput, productsAmount)
     }
@@ -122,7 +122,7 @@ class OrderComponentProductAmountUnitTest {
 
             )
         )
-        val productsAmount = orderComponent.calculateProductAmount(products, productsSelectedInput)
+        val productsAmount = orderComponent.calculateProductAmount(products)
 
         assertEquals(productsSelectedOutput, productsAmount)
     }

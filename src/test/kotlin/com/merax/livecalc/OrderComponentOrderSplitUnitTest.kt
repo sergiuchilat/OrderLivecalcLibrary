@@ -89,7 +89,7 @@ class OrderComponentOrderSplitUnitTest {
         storage.data.input.orderSettings.selectedClientType = ClientType.PHYSICAL
 
         storage.setProductsQuantity(
-            orderComponent.calculateProductAmount(storage.data.input.products, storage.data.output.products)
+            orderComponent.calculateProductAmount(storage.data.input.products)
         )
         val ordersBefore = Orders(
             basic = storage.data.output.orders.basic,
@@ -132,7 +132,7 @@ class OrderComponentOrderSplitUnitTest {
         storage.data.input.orderSettings.selectedClientType = ClientType.JURIDICAL
 
         storage.setProductsQuantity(
-            orderComponent.calculateProductAmount(storage.data.input.products, storage.data.output.products)
+            orderComponent.calculateProductAmount(storage.data.input.products)
         )
         val ordersBefore = Orders(
             basic = storage.data.output.orders.basic,

@@ -15,14 +15,14 @@ enum class DiscountConditionApply{
 * id = productId(list of products in condition to check), value = quantity/amount
 * */
 data class DiscountConditionContent(
-    var id: List<Int> = listOf(),
-    var value: Float = 0.0F
+    val id: List<Int> = listOf(),
+    val value: Float = 0.0F
 )
 /*
 * How discount will be applied
 * */
 data class DiscountCondition(
-    var type: DiscountConditionTypes = DiscountConditionTypes.QUANTITY,
+    val type: DiscountConditionTypes = DiscountConditionTypes.QUANTITY,
     var apply: DiscountConditionApply = DiscountConditionApply.ONCE,
     var content: List<DiscountConditionContent> = listOf()
 )
@@ -42,21 +42,21 @@ enum class DiscountResultMatch{
 * id = productId, value = quantity/amount
 * */
 data class DiscountResultContent(
-    var id: Int = 0,
-    var value: Float = 0.0F
+    val id: Int = 0,
+    val value: Float = 0.0F
 )
 /*
 * What discount generate
 * */
 data class DiscountResult(
-    var type: DiscountResultTypes = DiscountResultTypes.PRODUCTS,
-    var match: DiscountResultMatch = DiscountResultMatch.AND,
-    var content: List<DiscountResultContent>? = listOf()
+    val type: DiscountResultTypes = DiscountResultTypes.PRODUCTS,
+    val match: DiscountResultMatch = DiscountResultMatch.AND,
+    var content: List<DiscountResultContent> = listOf()
 )
 
 data class DiscountIN(
-    var id: Int = 0,
+    val id: Int = 0,
     var canBeApplied: Boolean = true,
-    var condition: DiscountCondition? = null,
-    var result: DiscountResult? = null
+    var condition: DiscountCondition = DiscountCondition(),
+    val result: DiscountResult = DiscountResult()
 )

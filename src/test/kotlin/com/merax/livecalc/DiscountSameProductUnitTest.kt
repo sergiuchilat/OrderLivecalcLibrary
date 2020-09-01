@@ -5,10 +5,8 @@ import order.livecalc.v1.Components.Discount
 import order.livecalc.v1.Components.Order
 import order.livecalc.v1.Storage.*
 import order.livecalc.v1.Storage.CashIn
-import order.livecalc.v1.Storage.DiscountConditions.*
 import order.livecalc.v1.Storage.OrderSettings
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import org.junit.Assert.*
 import org.junit.jupiter.api.Test
 
 data class ProductMap(
@@ -147,11 +145,11 @@ class DiscountSameProductUnitTest {
     private fun generateProductVariants(products: List<ProductMap>): HashMap<Int, Product>{
         val resultContent = hashMapOf<Int, Product>()
         for(product in products){
-            resultContent.put(product.id, Product(
+            resultContent[product.id] = Product(
                 id = product.id,
                 quantity = product.quantity,
                 price = product.price
-            ))
+            )
         }
         return resultContent
     }
@@ -163,39 +161,82 @@ class DiscountSameProductUnitTest {
         ))
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
-        orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
+        orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
-        discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
+        discountComponent.apply(storage.data.input.discounts)
         assertEquals(emptyDiscounts, storage.data.output.discounts)
     }
 
     @Test
-    fun testN_FOR_M() {
-        /*Test 10 + 1*/
-        storage.data.input.discounts.put(1, discounts["10+1_same"]!!)
+    fun testN_FOR_M_same() {
+        /*********Test 10 + 1: not enough product quantity selected*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
         storage.data.input.products = generateProductVariants(listOf(
             ProductMap(1, 8, 3.23F),
             ProductMap(2, 10, 3.45F),
-            ProductMap(2, 10, 3.45F)
+            ProductMap(3, 10, 3.45F)
         ))
+        storage.data.output.discounts = hashMapOf()
 
-        orderComponent.calculateProductAmount(storage.data.input.products, storage.data.input.products)
+        orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
-        discountComponent.apply(storage.data.input.discounts, storage.data.input.products)
-        println(storage.data.output.discounts.isEmpty())
-        assertFalse("Generated bonus ", !storage.data.output.discounts.isEmpty())
+        discountComponent.apply(storage.data.input.discounts)
+        assertFalse("10+1: not enough product quantity selected", storage.data.output.discounts.isNotEmpty())
+
+        /********Test 10 + 1: enough product quantity selected*/
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 11, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        assertEquals("10+1: enough product quantity selected", 1, storage.data.output.discounts[1]!!.products[1]!!)
+
+        /*******Test 7 + 3: enough product quantity selected*/
+        storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
+        storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 15, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        println(storage.data.output.discounts)
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts)
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1])
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1]!!.products[1])
+        assertEquals("7+3: enough product quantity selected", 6, storage.data.output.discounts[1]!!.products[1]!!)
     }
 
-    /*
-    * 10 + 1 foreach
-    *
-    * null -> 0
-    * 8 -> 0
-    * 10 -> 1
-    *
-    * 19 -> 1
-    * 20 -> 2
-    *
-    * */
+    @Test
+    fun testAvailableProducts(){
+        /***** 10 + 3 (available for bonus 4)*/
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 11, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
+        storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 10.0F))
+        storage.data.input.discounts[1]?.condition?.apply = DiscountConditionApply.ONCE
+        storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
+        storage.data.input.products[1]?.available = 15
 
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        println(storage.data.output.discounts)
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts)
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1])
+        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1]!!.products[1])
+        assertEquals("10+1: enough product quantity selected", 3, storage.data.output.discounts[1]!!.products[1]!!)
+    }
 }

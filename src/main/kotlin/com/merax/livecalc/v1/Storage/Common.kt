@@ -30,7 +30,7 @@ enum class ShipmentMethod {
 data class Product(
     @SerializedName("id")
     @Expose
-    var id: Int = 0,
+    val id: Int = 0,
     @SerializedName("only_juridical_sale")
     @Expose
     var onlyJuridicalSale: Boolean = false,

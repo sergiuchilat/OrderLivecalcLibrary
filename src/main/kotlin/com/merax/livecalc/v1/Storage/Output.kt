@@ -8,7 +8,7 @@ enum class ClientType {
 }
 
 data class Order (
-    var clientType: ClientType,
+    val clientType: ClientType,
     var products: HashMap <Int, Product>,
     var amount: Float = 0.0F,
     var amountDiscounted: Float = 0.0F
@@ -20,7 +20,7 @@ data class Orders (
     var zeroPrice: Order? = null
 )
 data class OrderParams(
-    var clientType: ClientType? = ClientType.JURIDICAL
+    val clientType: ClientType? = ClientType.JURIDICAL
 )
 
 data class WriteOff (

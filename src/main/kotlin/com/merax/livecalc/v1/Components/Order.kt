@@ -10,22 +10,17 @@ import order.livecalc.v1.Components.Utils as Utils
 class Order(val storage: Storage) : IComponent {
 
     fun calculateProductAmount(
-        products: HashMap<Int, Product> = hashMapOf(),
-        productsSelected: HashMap<Int, Product>
+        products: HashMap<Int, Product> = hashMapOf()
     ): HashMap<Int, Product> {
 
         if (products.isNullOrEmpty()) {
             return hashMapOf()
         }
-        if (productsSelected.isEmpty()) {
-            return hashMapOf()
-        }
         val productsResult = hashMapOf<Int, Product>()
         var orderAmount = 0.0F
 
-        for ((productID, product) in productsSelected) {
+        for ((productID, product) in products) {
             if (product.quantity > 0) {
-                product.id = productID
                 product.price = Utils().roundUp(products[productID]!!.price, 2)
                 product.priceDiscounted = product.price
                 product.amount = Utils().roundUp(products[productID]!!.price * product.quantity, 2)
