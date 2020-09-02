@@ -171,8 +171,8 @@ class Discount(val storage: Storage) : IComponent {
             if (
                 availableToSelect > 0 &&
                 quantityRequired > 0 &&
-                quantityGenerated > 0
-                && quantitySelected > 0 &&
+                quantityGenerated > 0 &&
+                quantitySelected > 0 &&
                 quantitySelected >= quantityRequired
             ) {
                 val coefficient = when (discount.condition.apply) {
