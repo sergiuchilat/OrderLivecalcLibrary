@@ -303,4 +303,25 @@ class DiscountSameProductUnitTest {
         assertNull("Test 10 + 1: 2 discount on same product, not enough products for second discount", storage.data.output.discounts[2])
         assertEquals("Test 10 + 1: 2 discount on same product, not enough products for second discount", 1, storage.data.output.discounts[1]!!.products[1]!!)
     }
+
+    @Test
+    fun testN_FOR_M_once() {
+        /*******Test 10 + 1: 2 discount on same product, not enough products for second discount*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy(condition = DiscountCondition(apply = DiscountConditionApply.ONCE) )
+        storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2, condition = DiscountCondition(apply = DiscountConditionApply.ONCE))
+
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 10, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 11
+
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        assertNull("Test 10 + 1: 2 discount on same product, not enough products for second discount", storage.data.output.discounts[2])
+        assertEquals("Test 10 + 1: 2 discount on same product, not enough products for second discount", 1, storage.data.output.discounts[1]!!.products[1]!!)
+    }
 }
