@@ -168,24 +168,28 @@ class Discount(val storage: Storage) : IComponent {
             val availableToSelect =
                 productTotals[product.id]?.available!! - quantitySelected - storage.data.input.products[product.id]!!.bonusTotalSelectedQuantity
 
-            if (availableToSelect < 1 || quantityRequired < 1 || quantityGenerated < 1 || quantitySelected < 1 || quantitySelected < quantityRequired) {
-                return@forEach
-            }
-
-            val coefficient = when (discount.condition.apply) {
-                DiscountConditionApply.FOREACH -> {
-                    floor(quantitySelected / quantityRequired).toInt()
+            if (
+                availableToSelect > 0 &&
+                quantityRequired > 0 &&
+                quantityGenerated > 0
+                && quantitySelected > 0 &&
+                quantitySelected >= quantityRequired
+            ) {
+                val coefficient = when (discount.condition.apply) {
+                    DiscountConditionApply.FOREACH -> {
+                        floor(quantitySelected / quantityRequired).toInt()
+                    }
+                    DiscountConditionApply.ONCE -> {
+                        1
+                    }
                 }
-                DiscountConditionApply.ONCE -> {
-                    1
+
+                val calculatedQuantity = min(availableToSelect, (quantityGenerated * coefficient).toInt())
+
+                if (calculatedQuantity > 0) {
+                    bonusProducts[product.id] = calculatedQuantity
+                    storage.data.input.products[product.id]!!.quantityBonusSelected[discount.id] = calculatedQuantity
                 }
-            }
-
-            val calculatedQuantity = min(availableToSelect, (quantityGenerated * coefficient).toInt())
-
-            if (calculatedQuantity > 0) {
-                bonusProducts[product.id] = calculatedQuantity
-                storage.data.input.products[product.id]!!.quantityBonusSelected[discount.id] = calculatedQuantity
             }
         }
         return bonusProducts
