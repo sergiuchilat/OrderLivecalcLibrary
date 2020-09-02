@@ -42,10 +42,17 @@ data class Product(
     var price: Float = 0.0F,
 
     var quantity: Int = 0,
+    var quantityBonusSelected: HashMap<Int, Int> = hashMapOf(),
     var amount: Float = 0.0F,
     var priceDiscounted: Float = 0.0F,
     var amountDiscounted: Float = 0.0F
-)
+) {
+
+    val bonusTotalSelectedQuantity: Int
+        get() {
+            return  quantityBonusSelected.map { it.value }.sum()
+        }
+}
 
 data class Cash (
     var juridical: Float,

@@ -6,7 +6,7 @@ import com.merax.livecalc.v1.Storage.DiscountResultTypes
 import order.livecalc.v1.Components.DiscountConditions.CheckCondition
 import order.livecalc.v1.Storage.*
 import kotlin.math.floor
-import kotlin.math.max
+import kotlin.math.min
 
 /** Discount calculation component
  * @property discountProductsMap - discount to product map
@@ -47,7 +47,7 @@ class Discount(val storage: Storage) : IComponent {
         val history = storage.data.input.salesHistory
         return history.client.month[1]!! > discount.applyConditions.salesHistory.salesAmountFrom
     }*/
-    private fun filterByClientSettings(discount: DiscountIN):Boolean{
+    private fun filterByClientSettings(discount: DiscountIN): Boolean {
         return true
     }
 
@@ -59,7 +59,6 @@ class Discount(val storage: Storage) : IComponent {
      */
     fun apply(discounts: HashMap<Int, DiscountIN>) {
         this.appliedDiscounts = hashMapOf()
-        println("discounts" + discounts)
         for ((_, discount) in discounts) {
             if (!this.canApply(discount))
                 continue
@@ -91,9 +90,9 @@ class Discount(val storage: Storage) : IComponent {
      * @return canBeCombined [Boolean]
      * */
     private fun canBeCombined(discount: DiscountIN) = true
-        /*discount.combineWith!!.isEmpty() || appliedDiscounts.isEmpty() || (discount.combineWith?.intersect(
-            appliedDiscounts.keys
-        ))!!.isNotEmpty()*/
+    /*discount.combineWith!!.isEmpty() || appliedDiscounts.isEmpty() || (discount.combineWith?.intersect(
+        appliedDiscounts.keys
+    ))!!.isNotEmpty()*/
 
     /**
      * Apply one of discounts
@@ -105,13 +104,12 @@ class Discount(val storage: Storage) : IComponent {
         var discountBonusPoints = 0
         var discountProducts: HashMap<Int, Int> = hashMapOf()
         val discountProductsToSelect: HashMap<Int, Int> = hashMapOf()
-        println(discount.result.type)
         when (discount.result.type) {
             DiscountResultTypes.PRODUCTS -> discountProducts = generateBonusProducts(discount)
             else -> return
         }
 
-        if (discountProducts.size > 0){
+        if (discountProducts.size > 0) {
             this.appliedDiscounts[discount.id] =
                 DiscountOutput(
                     discount.id,
@@ -156,33 +154,43 @@ class Discount(val storage: Storage) : IComponent {
     /**
      * Generate bonus products
      * @param discount [DiscountInput] - list of discounts to be applied
-     * @param products [HashMap] - list of products in order
      * @return bonusProducts [HashMap] - list of bonus products
      */
     private fun generateBonusProducts(
         discount: DiscountIN
     ): HashMap<Int, Int> {
         val bonusProducts: HashMap<Int, Int> = hashMapOf()
-        for (product in discount.result.content){
-            val quantityRequired = discount.result.content.first { it.id == product.id  }.value
+
+        discount.result.content.forEach { product ->
+            val quantityRequired = discount.condition.content.first { it.id.contains(product.id) }.value
+            val quantityGenerated = product.value
             val quantitySelected = productTotals[product.id]?.quantity!!
-            val availableToSelect = productTotals[product.id]?.available!! - quantitySelected
-            if(availableToSelect< 1 || quantityRequired < 1 || quantitySelected < 1 ||  quantitySelected < quantityRequired){
-                break
-            }
-            if(discount.condition.apply == DiscountConditionApply.FOREACH){
-                val coefficient = floor(quantitySelected / quantityRequired).toInt()
-                if(coefficient > 0){
-                    bonusProducts[product.id] = product.value.toInt() * floor(quantitySelected / quantityRequired).toInt()
-                }
-            } else if(discount.condition.apply == DiscountConditionApply.ONCE){
-                println("availableToSelect" + availableToSelect)
-                bonusProducts[product.id] = max(quantityRequired.toInt(), availableToSelect)
+            val availableToSelect =
+                productTotals[product.id]?.available!! - quantitySelected - storage.data.input.products[product.id]!!.bonusTotalSelectedQuantity
+
+            if (availableToSelect < 1 || quantityRequired < 1 || quantityGenerated < 1 || quantitySelected < 1 || quantitySelected < quantityRequired) {
+                return@forEach
             }
 
+            val coefficient = when (discount.condition.apply) {
+                DiscountConditionApply.FOREACH -> {
+                    floor(quantitySelected / quantityRequired).toInt()
+                }
+                DiscountConditionApply.ONCE -> {
+                    1
+                }
+            }
+
+            val calculatedQuantity = min(availableToSelect, (quantityGenerated * coefficient).toInt())
+
+            if (calculatedQuantity > 0) {
+                bonusProducts[product.id] = calculatedQuantity
+                storage.data.input.products[product.id]!!.quantityBonusSelected[discount.id] = calculatedQuantity
+            }
         }
         return bonusProducts
     }
+
 
     /**
      * Generate bonus points
@@ -236,9 +244,9 @@ class Discount(val storage: Storage) : IComponent {
             orderTotals.quantity += product.quantity
             orderTotals.amount += product.amount
         }
-       /* println("---")
-        println("product totals: " + productTotals.toString())
-        println("---")*/
+        /* println("---")
+         println("product totals: " + productTotals.toString())
+         println("---")*/
 
         /*for ((discountID, discount) in inputData.discounts) {
             if (

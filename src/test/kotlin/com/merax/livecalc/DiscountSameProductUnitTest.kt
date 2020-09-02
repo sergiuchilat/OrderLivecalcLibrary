@@ -155,7 +155,7 @@ class DiscountSameProductUnitTest {
     }
 
     @Test
-    fun emptyDiscounts() {
+    fun testEmptyDiscounts() {
         storage.data.input.products = generateProductVariants(listOf(
             ProductMap(1, 10, 3.23F)
         ))
@@ -168,8 +168,8 @@ class DiscountSameProductUnitTest {
     }
 
     @Test
-    fun testN_FOR_M_same() {
-        /*********Test 10 + 1: not enough product quantity selected*/
+    fun testN_FOR_M_same_not_required_min_quantity() {
+        /*********Test 10 + 1: not required min quantity(8) selected -> expected result = null or empty*/
         storage.data.input.discounts[1] = discounts["10+1_same"]!!
         storage.data.input.products = generateProductVariants(listOf(
             ProductMap(1, 8, 3.23F),
@@ -177,26 +177,37 @@ class DiscountSameProductUnitTest {
             ProductMap(3, 10, 3.45F)
         ))
         storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 25
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertFalse("10+1: not enough product quantity selected", storage.data.output.discounts.isNotEmpty())
+        assertTrue("10+1: not required min quantity selected", storage.data.output.discounts.isNullOrEmpty())
+    }
 
-        /********Test 10 + 1: enough product quantity selected*/
+    @Test
+    fun testN_FOR_M_same_expected_1() {
+        /********Test 10 + 1: required min quantity(10) selected -> expected result = 1*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
         storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 11, 3.23F),
+            ProductMap(1, 10, 3.23F),
             ProductMap(2, 10, 3.45F),
             ProductMap(3, 10, 3.45F)
         ))
         storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 25
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertEquals("10+1: enough product quantity selected", 1, storage.data.output.discounts[1]!!.products[1]!!)
+        println(storage.data.input.products)
+        assertEquals("10+1: required min quantity(10) selected", 1, storage.data.output.discounts[1]!!.products[1]!!)
+    }
 
-        /*******Test 7 + 3: enough product quantity selected*/
+    @Test
+    fun testN_FOR_M_same_7_plus_3_expected_6() {
+        /*******Test 7 + 3: required quantity selected*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
         storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
         storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
         storage.data.input.products = generateProductVariants(listOf(
@@ -205,38 +216,95 @@ class DiscountSameProductUnitTest {
             ProductMap(3, 10, 3.45F)
         ))
         storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 25
+
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        println(storage.data.output.discounts)
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts)
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1])
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1]!!.products[1])
-        assertEquals("7+3: enough product quantity selected", 6, storage.data.output.discounts[1]!!.products[1]!!)
+        assertEquals("Test 7 + 3: required quantity selected", 6, storage.data.output.discounts[1]!!.products[1]!!)
     }
 
     @Test
-    fun testAvailableProducts(){
-        /***** 10 + 3 (available for bonus 4)*/
+    fun testN_FOR_M_same_zero_available_to_select() {
+        /*******Test 7 + 3: zero quantity available to select*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
+        storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
+        storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
         storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 11, 3.23F),
+            ProductMap(1, 15, 3.23F),
             ProductMap(2, 10, 3.45F),
             ProductMap(3, 10, 3.45F)
         ))
         storage.data.output.discounts = hashMapOf()
-        storage.data.input.discounts[1] = discounts["10+1_same"]!!
-        storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 10.0F))
-        storage.data.input.discounts[1]?.condition?.apply = DiscountConditionApply.ONCE
-        storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
         storage.data.input.products[1]?.available = 15
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
+        assertTrue("Test 7 + 3: zero quantity available to select", storage.data.output.discounts.isNullOrEmpty())
+    }
+
+    @Test
+    fun testN_FOR_M_same_only_4_available_from_6_required() {
+        /*******Test 7 + 3: only 4 available to select from 6 required*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!
+        storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
+        storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 15, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 19
+
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
         println(storage.data.output.discounts)
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts)
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1])
-        assertNotNull("7+3: enough product quantity selected", storage.data.output.discounts[1]!!.products[1])
-        assertEquals("10+1: enough product quantity selected", 3, storage.data.output.discounts[1]!!.products[1]!!)
+        assertEquals("Test 7 + 3: only 4 available to select from 6 required", 4, storage.data.output.discounts[1]!!.products[1]!!)
+    }
+
+    @Test
+    fun testN_FOR_M_2_discounts() {
+        /*******Test 7 + 3: only 4 available to select from 6 required*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
+        storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2)
+
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 10, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 12
+
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        println(storage.data.output.discounts)
+        assertEquals("Test 7 + 3: only 4 available to select from 6 required", 2, storage.data.output.discounts[1]!!.products[1]!! + storage.data.output.discounts[2]!!.products[1]!!)
+    }
+
+    @Test
+    fun testN_FOR_M_2_discounts_not_enough_forD2() {
+        /*******Test 7 + 3: only 4 available to select from 6 required*/
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
+        storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2)
+
+        storage.data.input.products = generateProductVariants(listOf(
+            ProductMap(1, 10, 3.23F),
+            ProductMap(2, 10, 3.45F),
+            ProductMap(3, 10, 3.45F)
+        ))
+        storage.data.output.discounts = hashMapOf()
+        storage.data.input.products[1]?.available = 11
+
+        orderComponent.calculateProductAmount(storage.data.input.products)
+        discountComponent.createMap(storage.data.input)
+        discountComponent.apply(storage.data.input.discounts)
+        println(storage.data.output.discounts)
+        assertNull("", storage.data.output.discounts[2])
+        assertEquals("Test 7 + 3: only 4 available to select from 6 required", 1, storage.data.output.discounts[1]!!.products[1]!!)
     }
 }

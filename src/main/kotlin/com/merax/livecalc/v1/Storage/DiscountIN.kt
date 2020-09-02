@@ -55,7 +55,7 @@ data class DiscountResult(
 )
 
 data class DiscountIN(
-    val id: Int = 0,
+    var id: Int = 0,
     var canBeApplied: Boolean = true,
     var condition: DiscountCondition = DiscountCondition(),
     val result: DiscountResult = DiscountResult()
