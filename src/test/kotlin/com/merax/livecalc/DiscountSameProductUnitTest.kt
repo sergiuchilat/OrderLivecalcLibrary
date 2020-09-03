@@ -142,9 +142,9 @@ class DiscountSameProductUnitTest {
         )
     }
 
-    private fun generateProductVariants(products: List<ProductMap>): HashMap<Int, Product>{
+    private fun generateProductVariants(products: List<ProductMap>): HashMap<Int, Product> {
         val resultContent = hashMapOf<Int, Product>()
-        for(product in products){
+        for (product in products) {
             resultContent[product.id] = Product(
                 id = product.id,
                 quantity = product.quantity,
@@ -156,9 +156,11 @@ class DiscountSameProductUnitTest {
 
     @Test
     fun testEmptyDiscounts() {
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 10, 3.23F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 10, 3.23F)
+            )
+        )
 
         val emptyDiscounts: HashMap<Int, DiscountOutput> = hashMapOf()
         orderComponent.calculateProductAmount(storage.data.input.products)
@@ -171,11 +173,13 @@ class DiscountSameProductUnitTest {
     fun testN_FOR_M_same_not_required_min_quantity() {
         /*********Test 10 + 1: not required min quantity(8) selected -> expected result = null or empty*/
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 8, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 8, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 25
 
@@ -189,11 +193,13 @@ class DiscountSameProductUnitTest {
     fun testN_FOR_M_same_expected_1() {
         /********Test 10 + 1: required min quantity(10) selected -> expected result = 1*/
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 10, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 10, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 25
 
@@ -209,11 +215,13 @@ class DiscountSameProductUnitTest {
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
         storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
         storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 15, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 15, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 25
 
@@ -229,11 +237,13 @@ class DiscountSameProductUnitTest {
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
         storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
         storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 15, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 15, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 15
 
@@ -249,18 +259,24 @@ class DiscountSameProductUnitTest {
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
         storage.data.input.discounts[1]?.condition?.content = listOf(DiscountConditionContent(listOf(1), 7.0F))
         storage.data.input.discounts[1]?.result?.content = listOf(DiscountResultContent(1, 3.0F))
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 15, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 15, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 19
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertEquals("Test 7 + 3: only 4 available to select from 6 required", 4, storage.data.output.discounts[1]!!.products[1]!!)
+        assertEquals(
+            "Test 7 + 3: only 4 available to select from 6 required",
+            4,
+            storage.data.output.discounts[1]!!.products[1]!!
+        )
     }
 
     @Test
@@ -269,18 +285,36 @@ class DiscountSameProductUnitTest {
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
         storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2)
 
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 10, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 10, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 12
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertEquals("Test 10 + 1: apply 2 discounts on same product", 2, storage.data.output.discounts[1]!!.products[1]!! + storage.data.output.discounts[2]!!.products[1]!!)
+        assertNotNull("Test 10 + 1: apply 2 discounts on same product", storage.data.output.discounts[1])
+        assertNotNull("Test 10 + 1: apply 2 discounts on same product", storage.data.output.discounts[2])
+        assertEquals(
+            "Test 10 + 1: apply 2 discounts on same product",
+            1,
+            storage.data.output.discounts[2]!!.products[1]!!
+        )
+        assertEquals(
+            "Test 10 + 1: apply 2 discounts on same product",
+            1,
+            storage.data.output.discounts[2]!!.products[1]!!
+        )
+        assertEquals(
+            "Test 10 + 1: apply 2 discounts on same product",
+            2,
+            storage.data.output.discounts[1]!!.products[1]!! + storage.data.output.discounts[2]!!.products[1]!!
+        )
     }
 
     @Test
@@ -289,39 +323,54 @@ class DiscountSameProductUnitTest {
         storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
         storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2)
 
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 10, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 10, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 11
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertNull("Test 10 + 1: 2 discount on same product, not enough products for second discount", storage.data.output.discounts[2])
-        assertEquals("Test 10 + 1: 2 discount on same product, not enough products for second discount", 1, storage.data.output.discounts[1]!!.products[1]!!)
+        assertNull(
+            "Test 10 + 1: 2 discount on same product, not enough products for second discount",
+            storage.data.output.discounts[2]
+        )
+        assertEquals(
+            "Test 10 + 1: 2 discount on same product, not enough products for second discount",
+            1,
+            storage.data.output.discounts[1]!!.products[1]!!
+        )
     }
 
     @Test
     fun testN_FOR_M_once() {
         /*******Test 10 + 1: 2 discount on same product, not enough products for second discount*/
-        storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy(condition = DiscountCondition(apply = DiscountConditionApply.ONCE) )
-        storage.data.input.discounts[2] = discounts["10+1_same"]!!.copy(id = 2, condition = DiscountCondition(apply = DiscountConditionApply.ONCE))
-
-        storage.data.input.products = generateProductVariants(listOf(
-            ProductMap(1, 10, 3.23F),
-            ProductMap(2, 10, 3.45F),
-            ProductMap(3, 10, 3.45F)
-        ))
+        storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
+        storage.data.input.discounts[1]?.condition = DiscountCondition(apply = DiscountConditionApply.ONCE)
+        //storage.data.input.discounts[1] = discounts["10+1_same"]!!.copy()
+        println(storage.data.input.discounts[1])
+        storage.data.input.products = generateProductVariants(
+            listOf(
+                ProductMap(1, 10, 3.23F),
+                ProductMap(2, 10, 3.45F),
+                ProductMap(3, 10, 3.45F)
+            )
+        )
         storage.data.output.discounts = hashMapOf()
         storage.data.input.products[1]?.available = 11
 
         orderComponent.calculateProductAmount(storage.data.input.products)
         discountComponent.createMap(storage.data.input)
         discountComponent.apply(storage.data.input.discounts)
-        assertNull("Test 10 + 1: 2 discount on same product, not enough products for second discount", storage.data.output.discounts[2])
-        assertEquals("Test 10 + 1: 2 discount on same product, not enough products for second discount", 1, storage.data.output.discounts[1]!!.products[1]!!)
+        assertEquals(
+            "Test 10 + 1: 2 discount on same product, not enough products for second discount",
+            1,
+            storage.data.output.discounts[1]!!.products[1]!!
+        )
     }
 }
