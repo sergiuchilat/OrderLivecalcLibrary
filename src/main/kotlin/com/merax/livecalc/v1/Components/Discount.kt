@@ -185,7 +185,7 @@ class Discount(val storage: Storage) : IComponent {
                 }
 
                 val calculatedQuantity = min(availableToSelect, (quantityGenerated * coefficient).toInt())
-
+                println(calculatedQuantity)
                 if (calculatedQuantity > 0) {
                     bonusProducts[product.id] = calculatedQuantity
                     storage.data.input.products[product.id]!!.quantityBonusSelected[discount.id] = calculatedQuantity
