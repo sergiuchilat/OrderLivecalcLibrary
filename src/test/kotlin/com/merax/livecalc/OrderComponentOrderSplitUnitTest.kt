@@ -91,16 +91,12 @@ class OrderComponentOrderSplitUnitTest {
         storage.setProductsQuantity(
             orderComponent.calculateProductAmount(storage.data.input.products)
         )
-        val ordersBefore = Orders(
-            basic = storage.data.output.orders.basic,
-            additional = null
-        )
         orderComponent.split()
         val ordersAfter = Orders(
             basic = storage.data.output.orders.basic,
             additional = storage.data.output.orders.additional
         )
-        assertEquals(ordersBefore, ordersAfter)
+        assertNull(ordersAfter.zeroPrice)
     }
 
     @Test
@@ -118,13 +114,15 @@ class OrderComponentOrderSplitUnitTest {
                 id = 1,
                 onlyJuridicalSale = false,
                 available = 10,
-                price = 1.25F
+                price = 1.25F,
+                quantity = 5
             )
         )
 
         storage.data.output.products = hashMapOf(
             1 to Product(
-                quantity = 5
+                quantity = 5,
+                available = 10
             )
         )
 
@@ -134,15 +132,12 @@ class OrderComponentOrderSplitUnitTest {
         storage.setProductsQuantity(
             orderComponent.calculateProductAmount(storage.data.input.products)
         )
-        val ordersBefore = Orders(
-            basic = storage.data.output.orders.basic,
-            additional = null
-        )
         orderComponent.split()
         val ordersAfter = Orders(
             basic = storage.data.output.orders.basic,
             additional = storage.data.output.orders.additional
         )
-        assertEquals(ordersBefore, ordersAfter)
+        assertNull(ordersAfter.additional)
+        assertNull(ordersAfter.zeroPrice)
     }
 }

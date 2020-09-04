@@ -116,7 +116,6 @@ class Order(val storage: Storage) : IComponent {
             orders.additional!!.amountDiscounted += product.price * additionalQuantity
         }
         calculateTotals(orders)
-
         storage.data.output.orders = orders
     }
 
