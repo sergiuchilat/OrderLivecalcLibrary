@@ -28,6 +28,7 @@ class Order(val storage: Storage) : IComponent {
                 productsResult[productID] = product
                 orderAmount += product.amount
             }
+            println(product)
         }
         storage.data.output.orders.basic = OrderItem(
             clientType = ClientType.PHYSICAL,

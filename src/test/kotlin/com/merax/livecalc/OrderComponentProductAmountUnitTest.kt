@@ -89,31 +89,23 @@ class OrderComponentProductAmountUnitTest {
             1 to Product(
                 id = 1,
                 onlyJuridicalSale = false,
-                available = 10,
+                available = 100,
+                quantity = 0,
                 price = 3.14F
             ),
             2 to Product(
                 id = 2,
                 onlyJuridicalSale = false,
-                available = 10,
+                quantity = 19,
+                available = 100,
                 price = 2.53F
-            )
-        )
-
-        val productsSelectedInput = hashMapOf<Int, Product>(
-            1 to Product(
-                id = 1,
-                quantity = 0
-            ),
-            2 to Product(
-                id = 2,
-                quantity = 19
             )
         )
 
         val productsSelectedOutput = hashMapOf<Int, Product>(
             2 to Product(
                 id = 2,
+                available = 100,
                 quantity = 19,
                 amount = 48.07F,
                 amountDiscounted = 48.07F,
